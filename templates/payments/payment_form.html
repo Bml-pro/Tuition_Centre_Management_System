@@ -1,0 +1,318 @@
+
+{% extends "base.html" %}
+
+{% block title %}Record Payment | Wambura Training Centre{% endblock %}
+
+{% block extra_css %}
+<style>
+    .payment-page {
+        max-width: 1050px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 25px;
+    }
+
+    .page-header h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+        color: #0f172a;
+    }
+
+    .page-header p {
+        margin: 0;
+        color: #64748b;
+    }
+
+    .header-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 11px 16px;
+        border-radius: 7px;
+        text-decoration: none;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        font: inherit;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #1d4ed8;
+    }
+
+    .btn-secondary {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .payment-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(230px, 1fr);
+        gap: 22px;
+        align-items: start;
+    }
+
+    .payment-card,
+    .info-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.05);
+    }
+
+    .payment-card h2,
+    .info-card h2 {
+        margin: 0 0 8px;
+        font-size: 19px;
+        color: #0f172a;
+    }
+
+    .card-description {
+        color: #64748b;
+        font-size: 14px;
+        margin: 0 0 24px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .form-field {
+        min-width: 0;
+    }
+
+    .form-field label {
+        display: block;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 13px;
+        border: 1px solid #cbd5e1;
+        border-radius: 7px;
+        font: inherit;
+        background: white;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .help-text {
+        display: block;
+        margin-top: 6px;
+        color: #64748b;
+        font-size: 12px;
+    }
+
+    .field-error,
+    .form-errors {
+        color: #b91c1c;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .form-errors {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        padding: 12px;
+        border-radius: 7px;
+        margin-bottom: 20px;
+    }
+
+    .form-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .info-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+    }
+
+    .info-item {
+        padding: 15px 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        display: block;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+
+    .info-value {
+        color: #0f172a;
+        font-weight: 600;
+    }
+
+    .notice {
+        margin-top: 18px;
+        padding: 13px;
+        border-radius: 8px;
+        background: #eff6ff;
+        color: #1e40af;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 800px) {
+        .payment-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .payment-card,
+        .info-card {
+            padding: 18px;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-page">
+
+    <div class="page-header">
+        <div>
+            <h1>Record Payment</h1>
+            <p>Record a student's tuition payment accurately.</p>
+        </div>
+
+        <div class="header-actions">
+            <a href="{% url 'payment_list' %}" class="btn btn-secondary">
+                Payment Records
+            </a>
+
+            <a href="{% url 'dashboard_home' %}" class="btn btn-secondary">
+                Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="payment-layout">
+
+        <section class="payment-card">
+            <h2>Payment Information</h2>
+            <p class="card-description">
+                Complete the fields below and save the payment.
+            </p>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="form-errors">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="form-grid">
+                    {% for field in form %}
+                        <div class="form-field">
+                            {{ field.label_tag }}
+                            {{ field }}
+
+                            {% if field.help_text %}
+                                <small class="help-text">
+                                    {{ field.help_text }}
+                                </small>
+                            {% endif %}
+
+                            {% for error in field.errors %}
+                                <div class="field-error">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        Save Payment
+                    </button>
+
+                    <a href="{% url 'payment_list' %}" class="btn btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </section>
+
+        <aside class="info-card">
+            <h2>Before You Save</h2>
+            <p class="card-description">
+                Check the payment details carefully.
+            </p>
+
+            <div class="info-item">
+                <span class="info-label">Payment type</span>
+                <span class="info-value">Tuition Fee</span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">Currency</span>
+                <span class="info-value">Tanzanian Shillings (TSh)</span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">Payment method</span>
+                <span class="info-value">Cash</span>
+            </div>
+
+            <div class="notice">
+                Ensure the student, amount, payment month, and year are correct.
+                The payment will be recorded under the account of the logged-in user.
+            </div>
+        </aside>
+
+    </div>
+</div>
+{% endblock %}

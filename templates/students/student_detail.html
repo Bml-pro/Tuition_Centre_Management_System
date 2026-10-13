@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {{ student.full_name }} | Wambura Training Centre
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 16px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow:
+                0 4px 12px
+                rgba(0, 0, 0, 0.06);
+        }
+
+        .card h2 {
+            margin-top: 0;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 15px;
+        }
+
+        .info-item {
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 6px;
+        }
+
+        .label {
+            display: block;
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .value {
+            font-weight: bold;
+        }
+
+        .financial-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+        }
+
+        .financial-card {
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .financial-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        @media (max-width: 800px) {
+
+            .financial-grid {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .actions {
+                flex-wrap: wrap;
+            }
+
+            .financial-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div>
+
+            <h1>
+                {{ student.full_name }}
+            </h1>
+
+            <p>
+                {{ student.student_id }}
+            </p>
+
+        </div>
+
+        <div class="actions">
+
+            <a
+                href="{% url 'student_update' student.pk %}"
+                class="btn"
+            >
+                Edit Student
+            </a>
+
+            <a
+    href="{% url 'payment_create' %}?student={{ student.pk }}"
+    class="btn"
+>
+    Record Payment
+</a>
+
+            <a
+                href="{% url 'student_list' %}"
+                class="btn btn-secondary"
+            >
+                Back
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- STUDENT INFORMATION -->
+
+    <div class="card">
+
+        <h2>
+            Student Information
+        </h2>
+
+        <div class="info-grid">
+
+            <div class="info-item">
+
+                <span class="label">
+                    Student ID
+                </span>
+
+                <span class="value">
+                    {{ student.student_id }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="label">
+                    Full Name
+                </span>
+
+                <span class="value">
+                    {{ student.full_name }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="label">
+                    Gender
+                </span>
+
+                <span class="value">
+                    {{ student.get_gender_display }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="label">
+                    Date of Birth
+                </span>
+
+                <span class="value">
+
+                    {% if student.date_of_birth %}
+                        {{ student.date_of_birth|date:"d M Y" }}
+                    {% else %}
+                        Not provided
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="label">
+                    Parent / Guardian
+                </span>
+
+                <span class="value">
+                    {{ student.parent_guardian_name }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="label">
+                    Parent Phone
+                </span>
+
+                <span class="value">
+                    {{ student.parent_phone }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="label">
+                    Class
+                </span>
+
+                <span class="value">
+
+                    {% if student.student_class %}
+                        {{ student.student_class }}
+                    {% else %}
+                        Not Assigned
+                    {% endif %}
+
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="label">
+                    Status
+                </span>
+
+                <span class="value">
+                    {{ student.get_status_display }}
+                </span>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span class="label">
+                    Registration Date
+                </span>
+
+                <span class="value">
+                    {{ student.registration_date|date:"d M Y" }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FINANCIAL SUMMARY -->
+
+    <div class="card">
+
+    <h2>
+        Tuition Information
+    </h2>
+
+    {% if tuition_setting %}
+
+        <p>
+            Monthly Tuition Fee:
+            <strong>
+                TSh {{ tuition_setting.monthly_fee|floatformat:2 }}
+            </strong>
+        </p>
+
+        <p>
+            This is the centre-wide monthly tuition fee.
+        </p>
+
+    {% else %}
+
+        <p>
+            Monthly tuition fee has not been configured.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+    <!-- PAYMENT HISTORY -->
+
+    <div class="card">
+
+        <h2>
+            Payment History
+        </h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Date
+                    </th>
+
+                    <th>
+                        Amount
+                    </th>
+
+                    <th>
+                        Method
+                    </th>
+
+                    <th>
+                        Recorded By
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for payment in payments %}
+
+                <tr>
+
+                    <td>
+                        {{ payment.payment_date|date:"d M Y" }}
+                    </td>
+
+                    <td>
+                        TSh {{ payment.amount|floatformat:2 }}
+                    </td>
+
+                    <td>
+                        {{ payment.get_payment_method_display }}
+                    </td>
+
+                    <td>
+                        {{ payment.recorded_by.username }}
+                    </td>
+
+                </tr>
+
+            {% empty %}
+
+                <tr>
+
+                    <td colspan="4">
+                        No payments have been recorded.
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

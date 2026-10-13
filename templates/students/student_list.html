@@ -1,0 +1,274 @@
+
+{% extends "base.html" %}
+
+{% block title %}Students | Wambura Training Centre{% endblock %}
+
+{% block extra_css %}
+<style>
+    .students-page {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .students-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 24px;
+    }
+
+    .students-header h1 {
+        margin: 0 0 7px;
+        font-size: 28px;
+    }
+
+    .students-header p {
+        margin: 0;
+        color: #64748b;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+        display: inline-block;
+        padding: 11px 16px;
+        border-radius: 7px;
+        text-decoration: none;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+    }
+
+    .primary-btn {
+        background: #2563eb;
+        color: white;
+    }
+
+    .primary-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .secondary-btn {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .students-search {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        background: white;
+        padding: 18px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, 0.04);
+    }
+
+    .students-search input {
+        flex: 1;
+        min-width: 200px;
+        padding: 11px 13px;
+        border: 1px solid #cbd5e1;
+        border-radius: 7px;
+        font: inherit;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, 0.05);
+    }
+
+    .table-scroll {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .students-table {
+        width: 100%;
+        min-width: 850px;
+        border-collapse: collapse;
+    }
+
+    .students-table th,
+    .students-table td {
+        padding: 15px 16px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .students-table th {
+        background: #f8fafc;
+        color: #475569;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .students-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .student-id {
+        color: #2563eb;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .student-id:hover {
+        text-decoration: underline;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-inactive {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .empty-state {
+        padding: 35px 20px;
+        text-align: center;
+        color: #64748b;
+    }
+
+    .table-footer {
+        padding: 15px 18px;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    @media (max-width: 640px) {
+        .students-header h1 {
+            font-size: 24px;
+        }
+
+        .students-search {
+            align-items: stretch;
+        }
+
+        .students-search input {
+            min-width: 100%;
+            box-sizing: border-box;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="students-page">
+
+    <div class="students-header">
+        <div>
+            <h1>Students</h1>
+            <p>Manage student registration and records.</p>
+        </div>
+
+        <a href="{% url 'student_create' %}" class="primary-btn">
+            + Register Student
+        </a>
+    </div>
+
+    <form method="GET" class="students-search">
+        <input
+            type="text"
+            name="q"
+            value="{{ query|default:'' }}"
+            placeholder="Search by student name or ID..."
+            aria-label="Search students"
+        >
+
+        <button type="submit" class="primary-btn">
+            Search
+        </button>
+
+        {% if query %}
+            <a href="{% url 'student_list' %}" class="secondary-btn">
+                Clear
+            </a>
+        {% endif %}
+    </form>
+
+    <div class="table-card">
+        <div class="table-scroll">
+            <table class="students-table">
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Full Name</th>
+                        <th>Class</th>
+                        <th>Total Paid</th>
+                        <th>Balance</th>
+                        <th>Student Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for student in students %}
+                        <tr>
+                            <td>
+                                <a
+                                    href="{% url 'student_detail' student.pk %}"
+                                    class="student-id"
+                                >
+                                    {{ student.student_id }}
+                                </a>
+                            </td>
+
+                            <td>{{ student.full_name }}</td>
+
+                            <td>
+                                {{ student.student_class|default:"Not Assigned" }}
+                            </td>
+
+                            <td>
+                                TSh {{ student.total_paid|default:0|floatformat:2 }}
+                            </td>
+
+                            <td>
+                                {% if student.balance != None %}
+                                    TSh {{ student.balance|floatformat:2 }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if student.status == "ACTIVE" %}
+                                    <span class="status-badge">Active</span>
+                                {% else %}
+                                    <span class="status-badge status-inactive">
+                                        {{ student.get_status_display }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                No students found. Try another search or register a student.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-footer">
+            Student records
+        </div>
+    </div>
+
+</div>
+{% endblock %}

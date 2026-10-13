@@ -1,0 +1,557 @@
+
+{% extends "base.html" %}
+
+{% block title %}Monthly Tuition Report | Wambura Tuition System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .report-page {
+        max-width: 1450px;
+        margin: 0 auto;
+    }
+
+    .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .report-header h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+        color: #172033;
+    }
+
+    .report-subtitle {
+        margin: 0;
+        color: #64748b;
+        font-size: 14px;
+    }
+
+    .report-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .report-actions .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .report-filter {
+        display: flex;
+        align-items: end;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .filter-field {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        min-width: 160px;
+        flex: 1;
+    }
+
+    .filter-field label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    .filter-field select,
+    .filter-field input {
+        width: 100%;
+        min-height: 43px;
+        background: #fff;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+    .summary-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 13px;
+        padding: 22px;
+        box-shadow: 0 3px 12px rgba(15, 23, 42, 0.035);
+    }
+
+    .summary-label {
+        display: block;
+        color: #64748b;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .summary-value {
+        font-size: clamp(19px, 2vw, 27px);
+        font-weight: 700;
+        color: #172033;
+        overflow-wrap: anywhere;
+    }
+
+    .summary-card.expected {
+        border-top: 4px solid #2563eb;
+    }
+
+    .summary-card.collected {
+        border-top: 4px solid #16a34a;
+    }
+
+    .summary-card.balance {
+        border-top: 4px solid #ea580c;
+    }
+
+    .report-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .report-toolbar h2 {
+        margin: 0;
+        font-size: 19px;
+    }
+
+    .export-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .export-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 16px;
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        transition: transform .2s, opacity .2s;
+    }
+
+    .export-btn:hover {
+        transform: translateY(-2px);
+        opacity: .9;
+    }
+
+    .export-pdf {
+        background: #dc2626;
+    }
+
+    .export-excel {
+        background: #15803d;
+    }
+
+    .table-card {
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .table-scroll {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .report-table {
+        width: 100%;
+        min-width: 850px;
+        border-collapse: collapse;
+    }
+
+    .report-table th {
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 11px;
+        letter-spacing: .45px;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .report-table th,
+    .report-table td {
+        padding: 15px 17px;
+        border-bottom: 1px solid #e2e8f0;
+        text-align: left;
+    }
+
+    .report-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .report-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .student-name {
+        font-weight: 600;
+        color: #172033;
+    }
+
+    .student-id {
+        color: #64748b;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .amount {
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-paid {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .status-partial {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-unpaid {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .status-unconfigured {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .report-table tfoot th {
+        background: #eff6ff;
+        color: #1e3a8a;
+        font-size: 13px;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    .empty-state {
+        text-align: center !important;
+        padding: 40px 20px !important;
+        color: #64748b;
+    }
+
+    .report-footer {
+        margin-top: 15px;
+        color: #64748b;
+        font-size: 12px;
+        text-align: right;
+    }
+
+    @media (max-width: 760px) {
+        .report-header h1 {
+            font-size: 23px;
+        }
+
+        .summary-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .summary-card {
+            padding: 18px;
+        }
+
+        .report-filter {
+            align-items: stretch;
+        }
+
+        .filter-field {
+            min-width: 100%;
+        }
+
+        .report-actions,
+        .export-actions {
+            width: 100%;
+        }
+
+        .report-actions .btn,
+        .export-actions .export-btn {
+            flex: 1;
+        }
+
+        .report-toolbar {
+            align-items: stretch;
+        }
+    }
+
+    @media print {
+        .sidebar,
+        .topbar,
+        .quick-nav,
+        .report-actions,
+        .report-filter,
+        .export-actions,
+        .footer {
+            display: none !important;
+        }
+
+        body {
+            background: white;
+        }
+
+        .main {
+            padding: 0;
+        }
+
+        .summary-card,
+        .table-card {
+            box-shadow: none;
+        }
+
+        .table-scroll {
+            overflow: visible;
+        }
+
+        .report-table {
+            min-width: 0;
+            font-size: 10px;
+        }
+
+        .report-table th,
+        .report-table td {
+            padding: 7px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="report-page">
+
+    <header class="report-header">
+        <div>
+            <h1>Monthly Payment Report</h1>
+            <p class="report-subtitle">
+                Track tuition collection, student balances, and payment status.
+            </p>
+        </div>
+
+        <div class="report-actions">
+            <a href="{% url 'dashboard_home' %}" class="btn btn-secondary">
+                ← Dashboard
+            </a>
+
+            <a href="{% url 'payment_list' %}" class="btn btn-secondary">
+                Payment Records
+            </a>
+
+            <a href="{% url 'payment_create' %}" class="btn">
+                + Record Payment
+            </a>
+        </div>
+    </header>
+
+    <section class="card">
+        <form method="GET" class="report-filter">
+
+            <div class="filter-field">
+                <label for="month">Report Month</label>
+                <select name="month" id="month">
+                    {% for number, name in months %}
+                        <option value="{{ number }}"
+                            {% if selected_month == number %}selected{% endif %}>
+                            {{ name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label for="year">Report Year</label>
+                <input
+                    type="number"
+                    name="year"
+                    id="year"
+                    value="{{ selected_year }}"
+                    min="2020"
+                    max="2100"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn">
+                View Report
+            </button>
+        </form>
+
+        <p class="report-subtitle">
+            Showing report for
+            <strong>{{ month_name }} {{ selected_year }}</strong>.
+            Monthly tuition fee:
+            <strong>TSh {{ monthly_fee|floatformat:2 }}</strong>
+        </p>
+    </section>
+
+    <section class="summary-grid">
+        <div class="summary-card expected">
+            <span class="summary-label">Total Expected</span>
+            <div class="summary-value">
+                TSh {{ total_expected|floatformat:2 }}
+            </div>
+        </div>
+
+        <div class="summary-card collected">
+            <span class="summary-label">Total Collected</span>
+            <div class="summary-value">
+                TSh {{ total_paid|floatformat:2 }}
+            </div>
+        </div>
+
+        <div class="summary-card balance">
+            <span class="summary-label">Outstanding Balance</span>
+            <div class="summary-value">
+                TSh {{ total_balance|floatformat:2 }}
+            </div>
+        </div>
+    </section>
+
+    <div class="report-toolbar">
+        <h2>Student Payment Status</h2>
+
+        <div class="export-actions">
+            <a
+                href="{% url 'export_monthly_report_pdf' %}?month={{ selected_month }}&year={{ selected_year }}"
+                class="export-btn export-pdf"
+            >
+                ↓ Export PDF
+            </a>
+
+            <a
+                href="{% url 'export_monthly_report_excel' %}?month={{ selected_month }}&year={{ selected_year }}"
+                class="export-btn export-excel"
+            >
+                ↓ Export Excel
+            </a>
+
+            <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="window.print()"
+            >
+                Print Report
+            </button>
+        </div>
+    </div>
+
+    <section class="card table-card">
+        <div class="table-scroll">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Student ID</th>
+                        <th>Expected</th>
+                        <th>Paid</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in report %}
+                        <tr>
+                            <td>
+                                <div class="student-name">
+                                    {{ item.student.full_name }}
+                                </div>
+                            </td>
+
+                            <td>{{ item.student.student_id }}</td>
+
+                            <td class="amount">
+                                TSh {{ item.monthly_fee|floatformat:2 }}
+                            </td>
+
+                            <td class="amount">
+                                TSh {{ item.paid|floatformat:2 }}
+                            </td>
+
+                            <td class="amount">
+                                <strong>
+                                    TSh {{ item.balance|floatformat:2 }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {% if item.status == "PAID" %}
+                                    <span class="status-badge status-paid">
+                                        Paid
+                                    </span>
+                                {% elif item.status == "PARTIALLY PAID" %}
+                                    <span class="status-badge status-partial">
+                                        Partially Paid
+                                    </span>
+                                {% elif item.status == "UNPAID" %}
+                                    <span class="status-badge status-unpaid">
+                                        Unpaid
+                                    </span>
+                                {% else %}
+                                    <span class="status-badge status-unconfigured">
+                                        Fee Not Set
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="empty-state">
+                                No active students were found for this report.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <th colspan="2">TOTAL</th>
+                        <th class="amount">
+                            TSh {{ total_expected|floatformat:2 }}
+                        </th>
+                        <th class="amount">
+                            TSh {{ total_paid|floatformat:2 }}
+                        </th>
+                        <th class="amount">
+                            TSh {{ total_balance|floatformat:2 }}
+                        </th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </section>
+
+    <div class="report-footer">
+        Wambura Tuition System · {{ month_name }} {{ selected_year }}
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,379 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}Wambura Tuition System{% endblock %}</title>
+
+    <style>
+        :root {
+            --primary: #1d4ed8;
+            --primary-dark: #1e40af;
+            --background: #f3f6fb;
+            --surface: #ffffff;
+            --text: #172033;
+            --muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        .topbar {
+            background: #111827;
+            color: white;
+            padding: 18px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .brand small {
+            display: block;
+            margin-top: 5px;
+            color: #cbd5e1;
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .topbar a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .layout {
+            display: flex;
+            min-height: calc(100vh - 75px);
+        }
+
+        .sidebar {
+            width: 230px;
+            flex-shrink: 0;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 24px 14px;
+        }
+
+        .nav-label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            padding: 0 12px;
+            margin: 12px 0;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            color: #334155;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .sidebar a:hover {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+            padding: 28px;
+        }
+
+        .page-container {
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 22px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 7px;
+            padding: 11px 16px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: #475569;
+        }
+
+        input, select, textarea {
+            max-width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font: inherit;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 13px 12px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 8px;
+            padding: 13px 16px;
+            margin-bottom: 8px;
+        }
+
+        .footer {
+            color: var(--muted);
+            text-align: center;
+            padding: 24px 10px;
+            font-size: 12px;
+        }
+
+        @media (max-width: 760px) {
+            .topbar {
+                padding: 16px;
+            }
+
+            .layout {
+                display: block;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding: 10px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+
+            .nav-label {
+                display: none;
+            }
+
+            .sidebar a {
+                margin: 0;
+                padding: 10px;
+            }
+
+            .main {
+                padding: 16px;
+            }
+
+            .card {
+                padding: 15px;
+                overflow-x: auto;
+            }
+        }
+
+        
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    margin-bottom: 5px;
+    border-radius: 8px;
+    color: #334155;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar a span {
+    width: 20px;
+    text-align: center;
+    font-size: 17px;
+}
+
+.sidebar a:hover {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.sidebar a:focus-visible {
+    outline: 2px solid #1d4ed8;
+    outline-offset: 2px;
+}
+
+
+.quick-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.quick-nav a {
+    display: inline-block;
+    padding: 9px 13px;
+    border-radius: 7px;
+    color: #334155;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.quick-nav a:hover {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+@media (max-width: 760px) {
+    .quick-nav {
+        padding: 10px 14px;
+        gap: 5px;
+    }
+
+    .quick-nav a {
+        padding: 9px;
+        font-size: 12px;
+    }
+}
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <header class="topbar">
+        <a href="{% url 'dashboard_home' %}" class="brand">
+            WAMBURA TUITION SYSTEM
+            <small>Student and Fee Management</small>
+        </a>
+
+        <span>
+            {% if request.user.is_authenticated %}
+                {{ request.user.username }}
+            {% endif %}
+        </span>
+    </header>
+
+<nav class="quick-nav">
+    <a href="{% url 'dashboard_home' %}">Dashboard</a>
+    <a href="{% url 'student_list' %}">Students</a>
+    <a href="{% url 'payment_list' %}">Payment Records</a>
+    <a href="{% url 'payment_create' %}">Record Payment</a>
+    <a href="{% url 'monthly_payment_report' %}">Monthly Reports</a>
+</nav>
+
+    <div class="layout">
+        
+<aside class="sidebar">
+    <div class="nav-label">MAIN MENU</div>
+
+    <a href="{% url 'dashboard_home' %}">
+        <span>▦</span> Dashboard
+    </a>
+
+    <a href="{% url 'student_list' %}">
+        <span>♙</span> Students
+    </a>
+
+    <div class="nav-label">FINANCE</div>
+
+    <a href="{% url 'payment_list' %}">
+        <span>▤</span> Payment Records
+    </a>
+
+    <a href="{% url 'payment_create' %}">
+        <span>＋</span> Record Payment
+    </a>
+
+    <a href="{% url 'monthly_payment_report' %}">
+        <span>▥</span> Monthly Reports
+    </a>
+
+    {% if request.user.is_staff %}
+        <div class="nav-label">ADMINISTRATION</div>
+
+        <a href="{% url 'admin:payments_tuitionsetting_changelist' %}">
+            <span>⚙</span> Tuition Settings
+        </a>
+
+        <a href="{% url 'admin:index' %}" target="_blank">
+            <span>⌘</span> Django Admin
+        </a>
+    {% endif %}
+</aside>
+
+        <main class="main">
+            <div class="page-container">
+
+                {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                            <div class="message">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% block content %}
+                {% endblock %}
+
+            </div>
+
+            <footer class="footer">
+                Wambura Tuition System &copy; {% now "Y" %}
+            </footer>
+        </main>
+    </div>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
